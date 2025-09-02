@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Mar  2 21:46:27 2019
-
-@author: PRATYUSH, Rahul, Somya, Abhay
-"""
 
 from flask import Flask, render_template
 from flask_cors import CORS, cross_origin
@@ -13,7 +8,7 @@ from datetime import datetime
 import crops
 import random
 
-# import matplotlib.pyplot as plt
+
 
 app = Flask(__name__)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -83,23 +78,15 @@ class Commodity:
         dataset = pd.read_csv(csv_name)
         self.X = dataset.iloc[:, :-1].values
         self.Y = dataset.iloc[:, 3].values
-
-        #from sklearn.model_selection import train_test_split
-        #X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1, random_state=0)
-
-        # Fitting decision tree regression to dataset
+      
         from sklearn.tree import DecisionTreeRegressor
         depth = random.randrange(7,18)
         self.regressor = DecisionTreeRegressor(max_depth=depth)
         self.regressor.fit(self.X, self.Y)
-        #y_pred_tree = self.regressor.predict(X_test)
-        # fsa=np.array([float(1),2019,45]).reshape(1,3)
-        # fask=regressor_tree.predict(fsa)
-
+     
     def getPredictedValue(self, value):
         if value[1]>=2019:
-            fsa = np.array(value).reshape(1, 3)
-            #print(" ",self.regressor.predict(fsa)[0])
+            fsa = np.array(value).reshape(1, 3)       
             return self.regressor.predict(fsa)[0]
         else:
             c=self.X[:,0:2]
@@ -112,9 +99,7 @@ class Commodity:
                 if x[i]==fsa:
                     ind=i
                     break
-            #print(index, " ",ind)
-            #print(x[ind])
-            #print(self.Y[i])
+        
             return self.Y[i]
 
     def getCropName(self):
@@ -141,11 +126,7 @@ def crop_profile(name):
     previous_x = [i[0] for i in prev_crop_values]
     previous_y = [i[1] for i in prev_crop_values]
     current_price = CurrentMonth(name)
-    #print(max_crop)
-    #print(min_crop)
-    #print(forecast_crop_values)
-    #print(prev_crop_values)
-    #print(str(forecast_x))
+ 
     crop_data = crops.crop(name)
     context = {
         "name":name,
@@ -179,7 +160,7 @@ def ticker(item, number):
 
         context = context + '%'
 
-    #print('context: ', context)
+
     return context
 
 
@@ -201,13 +182,13 @@ def TopFiveWinners():
         change.append((((current_predict - prev_predict) * 100 / prev_predict), commodity_list.index(i)))
     sorted_change = change
     sorted_change.sort(reverse=True)
-    # print(sorted_change)
+    
     to_send = []
     for j in range(0, 5):
         perc, i = sorted_change[j]
         name = commodity_list[i].getCropName().split('/')[1]
         to_send.append([name, round((current_month_prediction[i] * base[name]) / 100, 2), round(perc, 2)])
-    #print(to_send)
+    
     return to_send
 
 
@@ -234,7 +215,7 @@ def TopFiveLosers():
         perc, i = sorted_change[j]
         name = commodity_list[i].getCropName().split('/')[1]
         to_send.append([name, round((current_month_prediction[i] * base[name]) / 100, 2), round(perc, 2)])
-   # print(to_send)
+   
     return to_send
 
 
@@ -280,7 +261,6 @@ def SixMonthsForecast():
     crop_month_wise.append([month5[0][3],month5[len(month5)-1][2],month5[len(month5)-1][0],month5[len(month5)-1][1],month5[0][2],month5[0][0],month5[0][1]])
     crop_month_wise.append([month6[0][3],month6[len(month6)-1][2],month6[len(month6)-1][0],month6[len(month6)-1][1],month6[0][2],month6[0][0],month6[0][1]])
 
-   # print(crop_month_wise)
     return crop_month_wise
 
 def SixMonthsForecastHelper(name):
@@ -316,7 +296,7 @@ def SixMonthsForecastHelper(name):
         x = x.strftime("%b %y")
         crop_price.append([x, round((wpis[i]* base[name.capitalize()]) / 100, 2) , round(change[i], 2)])
 
-   # print("Crop_Price: ", crop_price)
+   
     return crop_price
 
 def CurrentMonth(name):
@@ -473,8 +453,3 @@ if __name__ == "__main__":
     commodity_list.append(wheat)
 
     app.run()
-
-
-
-
-
